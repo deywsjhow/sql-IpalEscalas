@@ -1,0 +1,332 @@
+
+
+
+--  -- PROCEDURE DE REGISTRO.
+-- CREATE PROCEDURE [dbo].[IPALSP_User] 
+--     @Nom_Login          VARCHAR(255)          = NULL, 
+--     @Nom_Senha          VARCHAR(255)          = NULL, 
+--     @Nom_Email          VARCHAR(255)          = NULL, 
+--     @Nome               VARCHAR(255)          = NULL,  
+--     @Atribuicao         VARCHAR(255)          = NULL,  
+--     @TipoVoz            VARCHAR(255)          = NULL,  
+--     @Instrumento        VARCHAR(255)          = NULL,  
+--     @SegundoInstrumento VARCHAR(255)          = NULL,  
+--     @Num_TipoLogin      INT                   = NULL,  
+--     @Cod_Erro           INT                   = NULL OUTPUT, 
+--     @Msg_Erro           VARCHAR(255)          = NULL OUTPUT 
+-- AS 
+-- BEGIN 
+--     -- Função: Registrar os usuários da plataforma 
+--     -- Data: 14/06 
+ 
+--     SELECT @Cod_Erro = CASE  
+--         WHEN (@Nom_Login          IS NULL OR @Nom_Login     = '') OR                                 
+--              (@Nom_Senha          IS NULL OR @Nom_Senha     = '') OR       
+--              (@Nom_Email          IS NULL OR @Nom_Email     = '') OR       
+--              (@Nome               IS NULL OR @Nome          = '') OR 
+--              (@Atribuicao         IS NULL OR @Atribuicao    = '') OR 
+--              (@TipoVoz            IS NULL OR @TipoVoz       = '') OR 
+--              (@Instrumento        IS NULL OR @Instrumento   = '') OR
+--              (@Num_TipoLogin      IS NULL OR @Num_TipoLogin   = '') 
+--         THEN 002 -- CAMPO VAZIO             
+--         ELSE 000 
+--     END 
+ 
+--     IF @Cod_Erro = 000 
+--     BEGIN 
+--         INSERT INTO [dbo].[Ipal_User] ( 
+--             Nom_Login,  
+--             Nom_Senha,  
+--             Nom_Email,  
+--             Nome, 
+--             Atribuicao, 
+--             TipoVoz, 
+--             Instrumento, 
+--             SegundoInstrumento,
+--             Num_TipoLogin, 
+--             Inst_Criacao 
+--         ) 
+--         VALUES ( 
+--             @Nom_Login, 
+--             @Nom_Senha,                   
+--             @Nom_Email,                   
+--             @Nome,                   
+--             @Atribuicao,         
+--             @TipoVoz,         
+--             @Instrumento,         
+--             @SegundoInstrumento,
+--             @Num_TipoLogin,
+--             GETDATE()  
+--         ) 
+--     END 
+     
+--     SELECT @Msg_Erro = [dbo].[IPALF_User_MensErro] (@Cod_Erro)
+-- END 
+
+
+
+
+-- -- PROCEDURE DE LOGIN
+
+-- CREATE PROCEDURE [dbo].[IPALSP_UserLogin]
+--     @Nom_Login          VARCHAR(255)         = NULL,
+--     @Nom_Senha          VARCHAR(255)         = NULL,
+--     @Num_TipoLogin      INT                  = NULL,
+--     @Cod_Erro           INT                  = NULL OUTPUT,
+--     @Msg_Erro           VARCHAR(255)         = NULL OUTPUT
+-- AS
+-- BEGIN
+--     -- Função: Autenticar os usuários na IPAL Escalas
+--     -- Data: 14/06
+
+
+--      DECLARE @tab_IUser TABLE    
+--     (    
+--      [id]                [int]                NOT NULL,
+--      [Nom_Login]         [varchar]    (80)    NOT NULL,
+--      [Nom_Senha]         [varchar]    (80)    NOT NULL,
+--      [Num_TipoLogin]     [int]                NOT NULL,
+--      [Nom_TipoLogin]     [varchar]    (80)    NOT NULL
+--     )
+    
+--     SELECT @Cod_Erro = CASE WHEN (@Nom_Login IS NULL OR @Nom_Login = '') OR
+--                                  (@Nom_Senha IS NULL OR @Nom_Senha = '') THEN 002 -- CAMPOS VAZIOS
+--                             WHEN @Num_TipoLogin IS NULL THEN 002
+                                
+--                        END   
+   
+
+--    INSERT INTO @tab_IUser(id, Nom_Login, Nom_Senha, Num_TipoLogin, Nom_TipoLogin)
+--    SELECT us.id, us.Nom_Login, us.Nom_Senha, us.Num_TipoLogin, tl.Nom_Tipo
+--      FROM [dbo].[Ipal_User] us
+--       WITH(NOLOCK, INDEX(1))
+--      LEFT OUTER JOIN [dbo].[Ipal_TipoLogin] tl
+--       WITH(NOLOCK, INDEX(1)) 
+--         ON tl.Seql_Tipo   = @Num_TipoLogin    
+--    WHERE @Nom_Login       = us.Nom_Login AND
+--          @Nom_Senha       = us.Nom_Senha  
+
+
+--    SELECT @Cod_Erro = CASE WHEN tu.Nom_Login IS NULL OR tu.Nom_Senha IS NULL   THEN 001 -- usuario n cadastrado
+--                            WHEN tu.Num_TipoLogin <> @Num_TipoLogin             THEN 003 -- TIPO LOGIN DIFERENTE
+--                            WHEN tu.Num_TipoLogin IS NULL                       THEN 002 -- VAZIO
+--                                                                                ELSE 000 --LOGIN OK
+--                       END
+--    FROM (SELECT TOP 1 * FROM @tab_IUser) tu
+  
+  
+--     IF @Cod_Erro = 000
+--     BEGIN
+--       SELECT us.Nom_Login, us.Nom_Senha, lo.Nom_Email, lo.Inst_Criacao,
+--              lo.Nome, lo.Atribuicao, lo.TipoVoz, lo.Instrumento, lo.SegundoInstrumento,
+--              tl.Seql_Tipo, tl.Nom_Tipo
+--         FROM @tab_IUser us
+--         LEFT OUTER JOIN [dbo].[Ipal_TipoLogin] tl            
+--           WITH(NOLOCK, INDEX(1))
+--           ON tl.Seql_Tipo   = @Num_TipoLogin 
+--         LEFT OUTER JOIN [dbo].[Ipal_User] lo
+--           ON  lo.id          = us.id
+--           AND lo.Nom_Login   = us.Nom_Login
+--           AND lo.Nom_Senha   = us.Nom_Senha            
+--       WHERE   us.Nom_Login   = @Nom_Login 
+--         AND   us.Nom_Senha   = @Nom_Senha
+--     END
+    
+--  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro);
+-- END
+
+
+-- PROC DE REGISTRA ESCALA
+
+-- CREATE PROCEDURE [dbo].[IPALSP_RegistraEscala]
+--   @Nom_Dirigente               VARCHAR(255)               = NULL,
+--   @Nom_PrimeiroBack            VARCHAR(255)               = NULL,
+--   @Nom_SegundoBack             VARCHAR(255)               = NULL,
+--   @Nom_TerceiroBack            VARCHAR(255)               = NULL, 
+--   @Nom_MusicoViolao            VARCHAR(255)               = NULL, 
+--   @Nom_MusicoBateria           VARCHAR(255)               = NULL, 
+--   @Nom_MusicoBaixo             VARCHAR(255)               = NULL, 
+--   @Nom_MusicoTeclado           VARCHAR(255)               = NULL,
+--   @Dat_DiaDaEscala             DATETIME                   = NULL,
+--   @Cod_Erro                    INT                        = NULL OUTPUT, 
+--   @Msg_Erro                    VARCHAR(255)               = NULL OUTPUT 
+-- AS
+-- BEGIN
+--     -- Função: Criar escalas 
+--     -- Data: 18/10
+
+--   SELECT @Cod_Erro = CASE WHEN @Nom_Dirigente   IS NULL OR @Nom_Dirigente = ''   THEN 001 -- Não foi inserido o dirigente da escala
+--                           WHEN @Dat_DiaDaEscala IS NULL OR @Dat_DiaDaEscala = '' THEN 003 -- Data da escala não foi inserida
+--                           ELSE                                                        000 -- ESCALA OK
+--                      END
+
+--   IF @Cod_Erro = 000
+--   BEGIN 
+--     INSERT INTO [dbo].[Ipal_Escalas] (Nom_Dirigente, Nom_PrimeiroBack, Nom_SegundoBack,
+--                                       Nom_TerceiroBack, Nom_MusicoViolao, Nom_MusicoBateria,
+--                                       Nom_MusicoBaixo, Nom_MusicoTeclado, Dat_DiaDaEscala, Inst_Criacao)
+  
+--     VALUES (@Nom_Dirigente, @Nom_PrimeiroBack, @Nom_SegundoBack, @Nom_TerceiroBack, @Nom_MusicoViolao,
+--             @Nom_MusicoBateria, @Nom_MusicoBaixo, @Nom_MusicoTeclado, @Dat_DiaDaEscala, getdate())
+--   END   
+--  SELECT @Msg_Erro = [dbo].[IPALF_RegistraEscala_MensErro] (@Cod_Erro);
+-- END
+
+-- --FUNCTION DE MSG ERRO
+-- CREATE FUNCTION [dbo].[IPALF_UserLogin_MensErro]( @Cod_Erro int ) RETURNS VARCHAR(255)    
+--  AS   
+--  BEGIN    
+--  -- Função devolver mensagem de erro   
+--  -- Data: 14/06    
+--  RETURN (CASE WHEN @Cod_Erro = 000 THEN 'USUÁRIO OK'   
+--               WHEN @Cod_Erro = 001 THEN 'Usuário não cadastrado'   
+--               WHEN @Cod_Erro = 002 THEN 'Campo Vazio. Tente Novamente'
+--               WHEN @Cod_Erro = 003 THEN 'Tipo do Login errado para o usuário.'  
+--               END)    
+--  END  
+
+-- PROC DE BUSCA ESCALA POR USUARIO
+
+-- CREATE PROCEDURE [dbo].[IPALSP_SelecionaEscalaUsuario]
+--   @Nom_Usuario                 VARCHAR(255)               = NULL,
+--   @Dat_DiaDaEscala_Ini         DATETIME                   = NULL, 
+--   @Dat_DiaDaEscala_Fim         DATETIME                   = NULL,
+--   @Cod_Erro                    INT                        = NULL OUTPUT, 
+--   @Msg_Erro                    VARCHAR(255)               = NULL OUTPUT 
+-- AS
+-- BEGIN
+--     -- Função: Select Escala tabela 
+--     -- Data: 18/10
+
+--   SELECT @Cod_Erro = CASE WHEN @Nom_Usuario         IS NULL OR @Nom_Usuario = ''                THEN 002 -- Não foi inserido valor
+--                           WHEN @Dat_DiaDaEscala_Ini IS NULL OR @Dat_DiaDaEscala_Ini = ''        THEN 002 -- Não foi inserido valor
+--                           WHEN @Dat_DiaDaEscala_Fim IS NULL OR @Dat_DiaDaEscala_Fim = ''        THEN 002 -- Não foi inserido valor
+--                                                                                                 ELSE 000 -- OK
+--                      END
+
+--   IF @Cod_Erro = 000
+--   BEGIN 
+--     SELECT ie.Nom_Dirigente, ie.Nom_PrimeiroBack, ie.Nom_SegundoBack, ie.Nom_TerceiroBack, ie.Nom_MusicoViolao,
+--             ie.Nom_MusicoBateria, ie.Nom_MusicoBaixo, ie.Nom_MusicoTeclado, s2.Dat_DiaDaEscala
+--     FROM [dbo].[Ipal_Escalas] ie
+--       WITH(NOLOCK INDEX(1))   
+--     OUTER APPLY(SELECT ss.Dat_DiaDaEscala
+--       FROM [dbo].[Ipal_Escalas] ss
+--       WHERE Dat_DiaDaEscala >= @Dat_DiaDaEscala_Ini AND Dat_DiaDaEscala <= @Dat_DiaDaEscala_Fim) s2
+--     WHERE @Nom_Usuario IN(
+--           ie.Nom_Dirigente,        
+--           ie.Nom_PrimeiroBack,    
+--           ie.Nom_SegundoBack,     
+--           ie.Nom_TerceiroBack,    
+--           ie.Nom_MusicoViolao,    
+--           ie.Nom_MusicoBateria,   
+--           ie.Nom_MusicoBaixo,     
+--           ie.Nom_MusicoTeclado) AND
+--           s2.Dat_DiaDaEscala = ie.Dat_DiaDaEscala
+--     ORDER BY ie.Dat_DiaDaEscala
+        
+
+--   END
+--  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro);
+-- END 
+
+
+
+-- PROCEDURA PEGA ESLACA MES QUE MANDAR
+
+-- CREATE PROCEDURE [dbo].[IPALSP_SelecionaEscalaQualquerData]
+--   @Dat_DiaDaEscala_Ini            DATETIME                   = NULL, 
+--   @Dat_DiaDaEscala_Fim            DATETIME                   = NULL, 
+--   @Cod_Erro                       INT                        = NULL OUTPUT, 
+--   @Msg_Erro                       VARCHAR(255)               = NULL OUTPUT 
+-- AS
+-- BEGIN
+--     -- Função: Select Escala tabela 
+--     -- Data: 18/10
+
+--   SELECT @Cod_Erro = CASE WHEN @Dat_DiaDaEscala_Ini IS NULL OR @Dat_DiaDaEscala_Ini = ''  THEN 002 -- Não foi inserido valor
+--                           WHEN @Dat_DiaDaEscala_Fim IS NULL OR @Dat_DiaDaEscala_Fim = ''  THEN 002 -- Não foi inserido valor
+--                           ELSE                                                    000 -- OK
+--                      END
+
+--   IF @Cod_Erro = 000
+--   BEGIN
+--     SELECT * 
+--     FROM [dbo].[Ipal_Escalas]
+--       WITH(NOLOCK INDEX(1))  
+--     WHERE Dat_DiaDaEscala >= @Dat_DiaDaEscala_Ini AND Dat_DiaDaEscala <= @Dat_DiaDaEscala_Fim
+--     ORDER BY Dat_DiaDaEscala   
+--   END
+--  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro);
+-- END 
+
+
+
+--  --FUNCTION MSG ERRO REGISTRAR
+--  CREATE FUNCTION [dbo].[IPALF_User_MensErro]( @Cod_Erro int ) RETURNS VARCHAR(255)   
+--  AS  
+--  BEGIN   
+--  -- Função devolver mensagem de erro  
+--  -- Data: 14/06   
+--  RETURN (CASE WHEN @Cod_Erro = 000 THEN 'USUÁRIO REGISTRADO'  
+--               WHEN @Cod_Erro = 001 THEN 'Houve problema no envio das informações'  
+--               WHEN @Cod_Erro = 002 THEN 'Campo Vazio. Tente Novamente' 
+--               END)   
+--  END 
+-- GO
+
+
+-- CREATE FUNCTION [dbo].[IPALF_RegistraEscala_MensErro]( @Cod_Erro int ) RETURNS VARCHAR(255)   
+--  AS  
+--  BEGIN   
+--  -- Função devolver mensagem de erro  
+--  -- Data: 18/10   
+--  RETURN (CASE WHEN @Cod_Erro = 000 THEN 'ESCALA REGISTRADA'  
+--               WHEN @Cod_Erro = 001 THEN 'Não foi inserido o dirigente da escala'  
+--               WHEN @Cod_Erro = 002 THEN 'Campo Vazio. Tente Novamente' 
+--               WHEN @Cod_Erro = 003 THEN 'Data da escala não foi inserida' 
+--               END)   
+--  END 
+-- GO
+
+
+
+
+-- ----------TABELAS CRIADAS
+
+
+
+-- CREATE TABLE Ipal_User (
+--   id                 INT IDENTITY(1,1) PRIMARY KEY,
+--   Nom_Login          VARCHAR(255)          NOT NULL,
+--   Nom_Senha          VARCHAR(255)          NOT NULL,
+--   Nom_Email          VARCHAR(255)          NOT NULL,
+--   Nome               VARCHAR(255)          NOT NULL, 
+--   Atribuicao         VARCHAR(255)          NOT NULL, 
+--   TipoVoz            VARCHAR(255)          NOT NULL, 
+--   Instrumento        VARCHAR(255)          NOT NULL, 
+--   SegundoInstrumento VARCHAR(255)          NULL, 
+--   Num_TipoLogin      INT                   NOT NULL, 
+--   Inst_Criacao       DATETIME              NOT NULL
+-- )
+
+
+-- CREATE TABLE Ipal_TipoLogin(
+--   Seql_Tipo        INT IDENTITY(1,1) PRIMARY KEY,
+--   Nom_Tipo         VARCHAR(255)          NOT NULL 
+-- )
+
+
+-- CREATE TABLE Ipal_Escalas (
+--   Seql_Escala                 INT IDENTITY(1,1) PRIMARY KEY,
+--   Nom_Dirigente               VARCHAR(255)               NOT NULL,
+--   Nom_PrimeiroBack            VARCHAR(255)               NULL,
+--   Nom_SegundoBack             VARCHAR(255)               NULL,
+--   Nom_TerceiroBack            VARCHAR(255)               NULL, 
+--   Nom_MusicoViolao            VARCHAR(255)               NULL, 
+--   Nom_MusicoBateria           VARCHAR(255)               NULL, 
+--   Nom_MusicoBaixo             VARCHAR(255)               NULL, 
+--   Nom_MusicoTeclado           VARCHAR(255)               NULL, 
+--   Dat_DiaDaEscala             DATETIME                   NOT NULL,
+--   Inst_Criacao                DATETIME                   NOT NULL
+-- )
