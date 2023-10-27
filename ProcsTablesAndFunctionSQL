@@ -116,7 +116,7 @@
   
 --     IF @Cod_Erro = 000
 --     BEGIN
---       SELECT us.Nom_Login, us.Nom_Senha, lo.Nom_Email, lo.Inst_Criacao,
+--       SELECT us.Nom_Login, lo.Nom_Email,
 --              lo.Nome, lo.Atribuicao, lo.TipoVoz, lo.Instrumento, lo.SegundoInstrumento,
 --              tl.Seql_Tipo, tl.Nom_Tipo
 --         FROM @tab_IUser us
@@ -133,7 +133,6 @@
     
 --  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro);
 -- END
-
 
 -- PROC DE REGISTRA ESCALA
 
