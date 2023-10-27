@@ -26,7 +26,6 @@
 --              (@Nome               IS NULL OR @Nome          = '') OR 
 --              (@Atribuicao         IS NULL OR @Atribuicao    = '') OR 
 --              (@TipoVoz            IS NULL OR @TipoVoz       = '') OR 
---              (@Instrumento        IS NULL OR @Instrumento   = '') OR
 --              (@Num_TipoLogin      IS NULL OR @Num_TipoLogin   = '') 
 --         THEN 002 -- CAMPO VAZIO             
 --         ELSE 000 
