@@ -116,7 +116,7 @@
   
 --     IF @Cod_Erro = 000
 --     BEGIN
---       SELECT us.Nom_Login, lo.Nom_Email,
+--       SELECT us.id, us.Nom_Login, lo.Nom_Email,
 --              lo.Nome, lo.Atribuicao, lo.TipoVoz, lo.Instrumento, lo.SegundoInstrumento,
 --              tl.Seql_Tipo, tl.Nom_Tipo
 --         FROM @tab_IUser us
@@ -328,3 +328,61 @@
 --   Dat_DiaDaEscala             DATETIME                   NOT NULL,
 --   Inst_Criacao                DATETIME                   NOT NULL
 -- )
+
+
+-- CREATE PROCEDURE [dbo].[IPALSP_AtualizaSenha]
+--     @Seql_Usuario       INT                  = NULL,
+--     @Nom_Senha          VARCHAR(255)         = NULL,
+--     @Nom_SenhaOld       VARCHAR(255)         = NULL,
+--     @Cod_Erro           INT                  = NULL OUTPUT,
+--     @Msg_Erro           VARCHAR(255)         = NULL OUTPUT
+-- AS
+-- BEGIN
+--     -- Função: Alterar senha dos usuários
+--     -- Data: 29/10
+
+--     DECLARE @tab_IUser TABLE    
+--     (    
+--      [id]                [int]                NOT NULL,
+--      [Nom_Senha]         [varchar]    (80)    NOT NULL
+--      )
+     
+--     SELECT @Cod_Erro = CASE WHEN (@Seql_Usuario IS NULL OR @Seql_Usuario = '') OR
+--                                  (@Nom_Senha IS NULL OR @Nom_Senha = '')       THEN 002 -- CAMPOS VAZIOS
+--                                                                                ELSE 000 -- OK                                
+--                        END 
+
+--     IF @Cod_Erro = 000
+--     BEGIN
+--       INSERT INTO @tab_IUser(id, Nom_Senha)
+--         SELECT us.id, us.Nom_Senha
+--         FROM [dbo].[Ipal_User] us     
+--         WHERE @Nom_SenhaOld       = us.Nom_Senha  
+
+--    SELECT @Cod_Erro = CASE WHEN tu.Nom_Senha = @Nom_Senha THEN 001 -- Senha igual a anterior.
+--                                                           ELSE 000 --LOGIN OK
+--                       END
+--    FROM (SELECT TOP 1 * FROM @tab_IUser) tu
+
+--    UPDATE [dbo].[Ipal_User]
+--      SET Nom_Senha = @Nom_Senha
+--    WHERE id = @Seql_Usuario
+--     END
+    
+--  SELECT @Msg_Erro = [dbo].[IPALF_UpdSenha] (@Cod_Erro);
+-- END
+-- GO
+
+
+
+-- CREATE FUNCTION [dbo].[IPALF_UpdSenha]( @Cod_Erro int ) RETURNS VARCHAR(255)   
+--  AS  
+--  BEGIN   
+--  -- Função devolver mensagem de erro troca de senha 
+--  -- Data: 18/10   
+--  RETURN (CASE WHEN @Cod_Erro = 000 THEN 'SENHA ATUALIZADA'  
+--               WHEN @Cod_Erro = 001 THEN 'Senha igual a anterior.'  
+--               WHEN @Cod_Erro = 002 THEN 'Campo Vazio. Tente Novamente' 
+--               END)   
+--  END 
+-- GO
