@@ -185,7 +185,7 @@
 
 -- PROC DE BUSCA ESCALA POR USUARIO
 
--- CREATE PROCEDURE [dbo].[IPALSP_SelecionaEscalaUsuario]
+-- -- CREATE PROCEDURE [dbo].[IPALSP_SelecionaEscalaUsuario]
 --   @Nom_Usuario                 VARCHAR(255)               = NULL,
 --   @Dat_DiaDaEscala_Ini         DATETIME                   = NULL, 
 --   @Dat_DiaDaEscala_Fim         DATETIME                   = NULL,
@@ -204,7 +204,7 @@
 
 --   IF @Cod_Erro = 000
 --   BEGIN 
---     SELECT ie.Nom_Dirigente, ie.Nom_PrimeiroBack, ie.Nom_SegundoBack, ie.Nom_TerceiroBack, ie.Nom_MusicoViolao,
+--     SELECT ie.Seql_Escala, ie.Nom_Dirigente, ie.Nom_PrimeiroBack, ie.Nom_SegundoBack, ie.Nom_TerceiroBack, ie.Nom_MusicoViolao,
 --             ie.Nom_MusicoBateria, ie.Nom_MusicoBaixo, ie.Nom_MusicoTeclado, s2.Dat_DiaDaEscala
 --     FROM [dbo].[Ipal_Escalas] ie
 --       WITH(NOLOCK INDEX(1))   
@@ -227,6 +227,7 @@
 --   END
 --  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro);
 -- END 
+
 
 
 
