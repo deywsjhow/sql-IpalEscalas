@@ -233,7 +233,7 @@
 
 -- PROCEDURA PEGA ESLACA MES QUE MANDAR
 
--- CREATE PROCEDURE [dbo].[IPALSP_SelecionaEscalaQualquerData]
+CREATE PROCEDURE [dbo].[IPALSP_SelecionaEscalaQualquerData]
 --   @Dat_DiaDaEscala_Ini            DATETIME                   = NULL, 
 --   @Dat_DiaDaEscala_Fim            DATETIME                   = NULL, 
 --   @Cod_Erro                       INT                        = NULL OUTPUT, 
@@ -250,7 +250,8 @@
 
 --   IF @Cod_Erro = 000
 --   BEGIN
---     SELECT * 
+--     SELECT Seql_Escala, Nom_Dirigente, Nom_PrimeiroBack, Nom_SegundoBack, Nom_TerceiroBack, Nom_MusicoViolao,
+--            Nom_MusicoBateria, Nom_MusicoBaixo, Nom_MusicoTeclado, Dat_DiaDaEscala 
 --     FROM [dbo].[Ipal_Escalas]
 --       WITH(NOLOCK INDEX(1))  
 --     WHERE Dat_DiaDaEscala >= @Dat_DiaDaEscala_Ini AND Dat_DiaDaEscala <= @Dat_DiaDaEscala_Fim
