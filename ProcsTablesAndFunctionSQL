@@ -136,7 +136,7 @@
 
 -- PROC DE REGISTRA ESCALA
 
--- CREATE PROCEDURE [dbo].[IPALSP_RegistraEscala]
+--  CREATE PROCEDURE [dbo].[IPALSP_RegistraEscala]
 --   @Nom_Dirigente               VARCHAR(255)               = NULL,
 --   @Nom_PrimeiroBack            VARCHAR(255)               = NULL,
 --   @Nom_SegundoBack             VARCHAR(255)               = NULL,
@@ -154,10 +154,20 @@
 --     -- Função: Criar escalas 
 --     -- Data: 18/10
 
---   SELECT @Cod_Erro = CASE WHEN @Nom_Dirigente   IS NULL OR @Nom_Dirigente = ''   THEN 001 -- Não foi inserido o dirigente da escala
+
+
+--     DECLARE @VerificaDia
+--             DATETIME
+
+--   SELECT @VerificaDia = es.Dat_DiaDaEscala
+--     FROM [dbo].[Ipal_Escalas] es
+--   WHERE @Dat_DiaDaEscala = es.Dat_DiaDaEscala
+  
+--   SELECT @Cod_Erro = CASE WHEN @Nom_Dirigente   IS NULL OR @Nom_Dirigente   = '' THEN 001 -- Não foi inserido o dirigente da escala
 --                           WHEN @Dat_DiaDaEscala IS NULL OR @Dat_DiaDaEscala = '' THEN 003 -- Data da escala não foi inserida
---                           ELSE                                                        000 -- ESCALA OK
---                      END
+--                           WHEN @VerificaDia     IS NOT NULL                      THEN 004 --Escala ja feita pra esse dia
+--                                                                                  ELSE 000 -- ESCALA OK
+--                      END  
 
 --   IF @Cod_Erro = 000
 --   BEGIN 
@@ -171,6 +181,7 @@
 --  SELECT @Msg_Erro = [dbo].[IPALF_RegistraEscala_MensErro] (@Cod_Erro);
 -- END
 -- GO
+
 
 -- PROC DE BUSCA ESCALA POR USUARIO
 
@@ -268,6 +279,8 @@
 -- GO
 
 
+-- DROP FUNCTION IPALF_RegistraEscala_MensErro
+-- GO
 -- CREATE FUNCTION [dbo].[IPALF_RegistraEscala_MensErro]( @Cod_Erro int ) RETURNS VARCHAR(255)   
 --  AS  
 --  BEGIN   
@@ -277,6 +290,7 @@
 --               WHEN @Cod_Erro = 001 THEN 'Não foi inserido o dirigente da escala'  
 --               WHEN @Cod_Erro = 002 THEN 'Campo Vazio. Tente Novamente' 
 --               WHEN @Cod_Erro = 003 THEN 'Data da escala não foi inserida' 
+--               WHEN @Cod_Erro = 004 THEN 'Escala já criada para esta data.' 
 --               END)   
 --  END 
 -- GO
