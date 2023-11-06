@@ -6,11 +6,7 @@
 --     @Nom_Login          VARCHAR(255)          = NULL, 
 --     @Nom_Senha          VARCHAR(255)          = NULL, 
 --     @Nom_Email          VARCHAR(255)          = NULL, 
---     @Nome               VARCHAR(255)          = NULL,  
---     @Atribuicao         VARCHAR(255)          = NULL,  
---     @TipoVoz            VARCHAR(255)          = NULL,  
---     @Instrumento        VARCHAR(255)          = NULL,  
---     @SegundoInstrumento VARCHAR(255)          = NULL,  
+--     @Atribuicao         VARCHAR(255)          = NULL,     
 --     @Num_TipoLogin      INT                   = NULL,  
 --     @Cod_Erro           INT                   = NULL OUTPUT, 
 --     @Msg_Erro           VARCHAR(255)          = NULL OUTPUT 
@@ -23,9 +19,7 @@
 --         WHEN (@Nom_Login          IS NULL OR @Nom_Login     = '') OR                                 
 --              (@Nom_Senha          IS NULL OR @Nom_Senha     = '') OR       
 --              (@Nom_Email          IS NULL OR @Nom_Email     = '') OR       
---              (@Nome               IS NULL OR @Nome          = '') OR 
 --              (@Atribuicao         IS NULL OR @Atribuicao    = '') OR 
---              (@TipoVoz            IS NULL OR @TipoVoz       = '') OR 
 --              (@Num_TipoLogin      IS NULL OR @Num_TipoLogin   = '') 
 --         THEN 002 -- CAMPO VAZIO             
 --         ELSE 000 
@@ -37,23 +31,15 @@
 --             Nom_Login,  
 --             Nom_Senha,  
 --             Nom_Email,  
---             Nome, 
 --             Atribuicao, 
---             TipoVoz, 
---             Instrumento, 
---             SegundoInstrumento,
 --             Num_TipoLogin, 
 --             Inst_Criacao 
 --         ) 
 --         VALUES ( 
 --             @Nom_Login, 
 --             @Nom_Senha,                   
---             @Nom_Email,                   
---             @Nome,                   
+--             @Nom_Email,                                     
 --             @Atribuicao,         
---             @TipoVoz,         
---             @Instrumento,         
---             @SegundoInstrumento,
 --             @Num_TipoLogin,
 --             GETDATE()  
 --         ) 
@@ -61,6 +47,7 @@
      
 --     SELECT @Msg_Erro = [dbo].[IPALF_User_MensErro] (@Cod_Erro)
 -- END 
+-- GO
 
 
 
@@ -70,69 +57,60 @@
 -- CREATE PROCEDURE [dbo].[IPALSP_UserLogin]
 --     @Nom_Login          VARCHAR(255)         = NULL,
 --     @Nom_Senha          VARCHAR(255)         = NULL,
---     @Num_TipoLogin      INT                  = NULL,
 --     @Cod_Erro           INT                  = NULL OUTPUT,
 --     @Msg_Erro           VARCHAR(255)         = NULL OUTPUT
 -- AS
 -- BEGIN
 --     -- Função: Autenticar os usuários na IPAL Escalas
 --     -- Data: 14/06
-
-
+    
 --      DECLARE @tab_IUser TABLE    
 --     (    
 --      [id]                [int]                NOT NULL,
 --      [Nom_Login]         [varchar]    (80)    NOT NULL,
 --      [Nom_Senha]         [varchar]    (80)    NOT NULL,
---      [Num_TipoLogin]     [int]                NOT NULL,
---      [Nom_TipoLogin]     [varchar]    (80)    NOT NULL
+--      [Num_TipoLogin]     [int]                NOT NULL
 --     )
         
 --     SELECT @Cod_Erro = CASE WHEN (@Nom_Login IS NULL OR @Nom_Login = '') OR
 --                                  (@Nom_Senha IS NULL OR @Nom_Senha = '') THEN 002 -- CAMPOS VAZIOS
---                             WHEN @Num_TipoLogin IS NULL THEN 002
-                                
+                                                                                                        
 --                        END   
    
 
---    INSERT INTO @tab_IUser(id, Nom_Login, Nom_Senha, Num_TipoLogin, Nom_TipoLogin)
---    SELECT us.id, us.Nom_Login, us.Nom_Senha, us.Num_TipoLogin, tl.Nom_Tipo
+
+--    INSERT INTO @tab_IUser(id, Nom_Login, Nom_Senha, Num_TipoLogin)
+--    SELECT us.id, us.Nom_Login, us.Nom_Senha, us.Num_TipoLogin
 --      FROM [dbo].[Ipal_User] us
 --       WITH(NOLOCK, INDEX(1))
---      LEFT OUTER JOIN [dbo].[Ipal_TipoLogin] tl
---       WITH(NOLOCK, INDEX(1)) 
---         ON tl.Seql_Tipo   = @Num_TipoLogin    
---    WHERE @Nom_Login       = us.Nom_Login AND
---          @Nom_Senha       = us.Nom_Senha  
-
+--    WHERE @Nom_Login = us.Nom_Login AND @Nom_Senha = us.Nom_Senha  
 
 --    SELECT @Cod_Erro = CASE WHEN tu.Nom_Login IS NULL OR tu.Nom_Senha IS NULL   THEN 001 -- usuario n cadastrado
---                            WHEN tu.Num_TipoLogin <> @Num_TipoLogin             THEN 003 -- TIPO LOGIN DIFERENTE
---                            WHEN tu.Num_TipoLogin IS NULL                       THEN 002 -- VAZIO
---                                                                                ELSE 000 --LOGIN OK
+--                                                                                ELSE 000 -- OK
 --                       END
---    FROM (SELECT TOP 1 * FROM @tab_IUser) tu
+--    FROM (SELECT TOP 1 * FROM @tab_IUser) tu  
+
   
   
 --     IF @Cod_Erro = 000
 --     BEGIN
 --       SELECT us.id, us.Nom_Login, lo.Nom_Email,
---              lo.Nome, lo.Atribuicao, lo.TipoVoz, lo.Instrumento, lo.SegundoInstrumento,
+--              lo.Atribuicao,
 --              tl.Seql_Tipo, tl.Nom_Tipo
 --         FROM @tab_IUser us
 --         LEFT OUTER JOIN [dbo].[Ipal_TipoLogin] tl            
 --           WITH(NOLOCK, INDEX(1))
---           ON tl.Seql_Tipo   = @Num_TipoLogin 
+--           ON tl.Seql_Tipo   = us.Num_TipoLogin
 --         LEFT OUTER JOIN [dbo].[Ipal_User] lo
 --           ON  lo.id          = us.id
 --           AND lo.Nom_Login   = us.Nom_Login
 --           AND lo.Nom_Senha   = us.Nom_Senha            
---       WHERE   us.Nom_Login   = @Nom_Login 
---         AND   us.Nom_Senha   = @Nom_Senha
+--       WHERE lo.id = us.id
 --     END
-    
+
 --  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro);
 -- END
+-- GO
 
 -- PROC DE REGISTRA ESCALA
 
@@ -307,17 +285,13 @@
 --   Nom_Login          VARCHAR(255)          NOT NULL,
 --   Nom_Senha          VARCHAR(255)          NOT NULL,
 --   Nom_Email          VARCHAR(255)          NOT NULL,
---   Nome               VARCHAR(255)          NOT NULL, 
 --   Atribuicao         VARCHAR(255)          NOT NULL, 
---   TipoVoz            VARCHAR(255)          NOT NULL, 
---   Instrumento        VARCHAR(255)          NOT NULL, 
---   SegundoInstrumento VARCHAR(255)          NULL, 
 --   Num_TipoLogin      INT                   NOT NULL, 
 --   Inst_Criacao       DATETIME              NOT NULL
 -- )
 -- GO
 
--- CREATE TABLE Ipal_TipoLogin(
+-- -- CREATE TABLE Ipal_TipoLogin(
 --   Seql_Tipo        INT IDENTITY(1,1) PRIMARY KEY,
 --   Nom_Tipo         VARCHAR(255)          NOT NULL 
 -- )
