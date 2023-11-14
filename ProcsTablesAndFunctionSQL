@@ -54,62 +54,73 @@
 
 -- -- PROCEDURE DE LOGIN
 
--- CREATE PROCEDURE [dbo].[IPALSP_UserLogin]
---     @Nom_Login          VARCHAR(255)         = NULL,
---     @Nom_Senha          VARCHAR(255)         = NULL,
---     @Cod_Erro           INT                  = NULL OUTPUT,
---     @Msg_Erro           VARCHAR(255)         = NULL OUTPUT
--- AS
--- BEGIN
---     -- Função: Autenticar os usuários na IPAL Escalas
---     -- Data: 14/06
+-- CREATE PROCEDURE [dbo].[IPALSP_                                  UserLogin] 
+--     @Nom_Login          VARCHAR(255)         = NULL, 
+--     @Nom_Senha          VARCHAR(255)         = NULL, 
+--     @Cod_Erro           INT                  = NULL OUTPUT, 
+--     @Msg_Erro           VARCHAR(255)         = NULL OUTPUT 
+-- AS 
+-- BEGIN 
+--     -- Função: Autenticar os usuários na IPAL Escalas 
+--     -- Data: 14/06 
+     
+--      DECLARE @tab_IUser TABLE     
+--     (     
+--      [id]                [int]                NULL, 
+--      [Nom_Login]         [varchar]    (80)    NULL, 
+--      [Nom_Senha]         [varchar]    (80)    NULL, 
+--      [Num_TipoLogin]     [int]                NULL 
+--     ) 
+
+--     SELECT @Cod_Erro = NULL
     
---      DECLARE @tab_IUser TABLE    
---     (    
---      [id]                [int]                NOT NULL,
---      [Nom_Login]         [varchar]    (80)    NOT NULL,
---      [Nom_Senha]         [varchar]    (80)    NOT NULL,
---      [Num_TipoLogin]     [int]                NOT NULL
---     )
-        
---     SELECT @Cod_Erro = CASE WHEN (@Nom_Login IS NULL OR @Nom_Login = '') OR
---                                  (@Nom_Senha IS NULL OR @Nom_Senha = '') THEN 002 -- CAMPOS VAZIOS
-                                                                                                        
---                        END   
-   
+--     SELECT @Cod_Erro = CASE WHEN (@Nom_Login IS NULL OR @Nom_Login = '') OR 
+--                                  (@Nom_Senha IS NULL OR @Nom_Senha = '') THEN 002 -- CAMPOS VAZIOS 
+--                                                                          ELSE 000  -- OK
+                                                                                                         
+--                        END  
+    
+ 
 
-
---    INSERT INTO @tab_IUser(id, Nom_Login, Nom_Senha, Num_TipoLogin)
---    SELECT us.id, us.Nom_Login, us.Nom_Senha, us.Num_TipoLogin
---      FROM [dbo].[Ipal_User] us
---       WITH(NOLOCK, INDEX(1))
---    WHERE @Nom_Login = us.Nom_Login AND @Nom_Senha = us.Nom_Senha  
-
---    SELECT @Cod_Erro = CASE WHEN tu.Nom_Login IS NULL OR tu.Nom_Senha IS NULL   THEN 001 -- usuario n cadastrado
---                                                                                ELSE 000 -- OK
---                       END
---    FROM (SELECT TOP 1 * FROM @tab_IUser) tu  
-
-  
-  
 --     IF @Cod_Erro = 000
 --     BEGIN
---       SELECT us.id, us.Nom_Login, lo.Nom_Email,
---              lo.Atribuicao,
---              tl.Seql_Tipo, tl.Nom_Tipo
---         FROM @tab_IUser us
---         LEFT OUTER JOIN [dbo].[Ipal_TipoLogin] tl            
---           WITH(NOLOCK, INDEX(1))
---           ON tl.Seql_Tipo   = us.Num_TipoLogin
---         LEFT OUTER JOIN [dbo].[Ipal_User] lo
---           ON  lo.id          = us.id
---           AND lo.Nom_Login   = us.Nom_Login
---           AND lo.Nom_Senha   = us.Nom_Senha            
---       WHERE lo.id = us.id
---     END
+--       INSERT INTO @tab_IUser(id, Nom_Login, Nom_Senha, Num_TipoLogin) 
+--       SELECT us.id, us.Nom_Login, us.Nom_Senha, us.Num_TipoLogin 
+--           FROM [dbo].[Ipal_User] us 
+--           WITH(NOLOCK, INDEX(1)) 
+--       WHERE us.Nom_Login = @Nom_Login
 
---  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro);
--- END
+--       SELECT @Cod_Erro = CASE WHEN tu.Nom_Login    IS NULL                      THEN 001 -- usuario n cadastrado 
+--                               WHEN tu.Nom_Senha    IS NULL                      THEN 001 -- usuario n cadastrado 
+--                               WHEN tu.Nom_Login    <>         @Nom_Login        THEN 001
+--                               WHEN tu.Nom_Senha    <>         @Nom_Senha        THEN 001
+--                                                                                 ELSE 000 -- OK 
+--                           END
+--       FROM (SELECT TOP 1 Nom_Login, Nom_Senha FROM @tab_IUser) tu
+
+--     END   
+   
+   
+--     IF @Cod_Erro = 000 
+--     BEGIN 
+--       SELECT us.id, us.Nom_Login, lo.Nom_Email, 
+--              lo.Atribuicao, 
+--              tl.Seql_Tipo, tl.Nom_Tipo 
+--         FROM @tab_IUser us 
+--         LEFT OUTER JOIN [dbo].[Ipal_TipoLogin] tl             
+--           WITH(NOLOCK, INDEX(1)) 
+--           ON tl.Seql_Tipo   = us.Num_TipoLogin 
+--         LEFT OUTER JOIN [dbo].[Ipal_User] lo 
+--           ON  lo.id          = us.id 
+--           AND lo.Nom_Login   = us.Nom_Login 
+--           AND lo.Nom_Senha   = us.Nom_Senha             
+--       WHERE lo.id = us.id
+--         AND lo.Nom_Login = us.Nom_Login
+--         AND lo.Nom_Senha = us.Nom_Senha 
+--     END 
+ 
+--  SELECT @Msg_Erro = [dbo].[IPALF_UserLogin_MensErro] (@Cod_Erro); 
+-- END 
 -- GO
 
 -- PROC DE REGISTRA ESCALA
@@ -330,9 +341,10 @@
 --      [Nom_Senha]         [varchar]    (80)    NOT NULL
 --      )
      
---     SELECT @Cod_Erro = CASE WHEN (@Seql_Usuario IS NULL OR @Seql_Usuario = '') OR
---                                  (@Nom_Senha IS NULL OR @Nom_Senha = '')       THEN 002 -- CAMPOS VAZIOS
---                                                                                ELSE 000 -- OK                                
+--     SELECT @Cod_Erro = CASE WHEN (@Seql_Usuario IS NULL OR @Seql_Usuario = '')   OR  
+--                                  (@Nom_Senha    IS NULL OR @Nom_Senha    = '')   OR  
+--                                  (@Nom_SenhaOld IS NULL OR @Nom_SenhaOld = '')   THEN 002 -- CAMPOS VAZIOS
+--                                                                                  ELSE 000 -- OK                                
 --                        END 
 
 --     IF @Cod_Erro = 000
@@ -340,12 +352,13 @@
 --       INSERT INTO @tab_IUser(id, Nom_Senha)
 --         SELECT us.id, us.Nom_Senha
 --         FROM [dbo].[Ipal_User] us     
---         WHERE @Nom_SenhaOld       = us.Nom_Senha  
+--         WHERE us.id = @Seql_Usuario  
 
---    SELECT @Cod_Erro = CASE WHEN tu.Nom_Senha = @Nom_Senha THEN 001 -- Senha igual a anterior.
---                                                           ELSE 000 --LOGIN OK
+--    SELECT @Cod_Erro = CASE WHEN tu.Nom_Senha =  @Nom_Senha     THEN 001 -- Senha igual a anterior.
+--                            WHEN tu.Nom_Senha <> @Nom_SenhaOld  THEN 003 -- Senha antiga errada
+--                                                                ELSE 000 --LOGIN OK
 --                       END
---    FROM (SELECT TOP 1 * FROM @tab_IUser) tu
+--    FROM (SELECT TOP 1 Nom_Senha FROM @tab_IUser) tu
 
 --    UPDATE [dbo].[Ipal_User]
 --      SET Nom_Senha = @Nom_Senha
@@ -366,6 +379,7 @@
 --  RETURN (CASE WHEN @Cod_Erro = 000 THEN 'SENHA ATUALIZADA'  
 --               WHEN @Cod_Erro = 001 THEN 'Senha igual a anterior.'  
 --               WHEN @Cod_Erro = 002 THEN 'Campo Vazio. Tente Novamente' 
+--               WHEN @Cod_Erro = 003 THEN 'Senha antiga errada!.' 
 --               END)   
 --  END 
 -- GO
