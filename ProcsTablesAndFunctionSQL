@@ -383,3 +383,14 @@
 --               END)   
 --  END 
 -- GO
+
+
+-- CREATE PROCEDURE [dbo].[IPALSP_UserSelect]
+-- AS
+-- BEGIN
+--     -- Função: Select Escala tabela 
+--     -- Data: 15/11 
+--  SELECT Nom_Login 
+--  FROM Ipal_User
+-- END
+-- GO
